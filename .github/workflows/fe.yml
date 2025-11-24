@@ -5,23 +5,21 @@ on:
     branches:
       - main
     paths:
-      - 'frontend/**'
+      - "frontend/**"
 
 jobs:
-  ftp-deploy:
-    name: Upload Frontend via FTP
+  deploy-frontend:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Deploy via FTP
+      - name: Deploy FE via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4
         with:
           server: ${{ secrets.FR_FTP_HOST }}
           username: ${{ secrets.FR_FTP_USER }}
           password: ${{ secrets.FR_FTP_PASSWORD }}
-          local-dir: "./frontend"
-          server-dir: "/public_html/"
-          dangerous-clean-slate: false
+          server-dir: "/htdocs/frontend/"
+          local-dir: "frontend/"
