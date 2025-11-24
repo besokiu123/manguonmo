@@ -5,33 +5,21 @@ on:
     branches:
       - main
     paths:
-      - 'backend/**'
+      - "backend/**"
 
 jobs:
-  ssh-deploy:
-    name: Deploy Backend via SSH
+  deploy-backend:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Copy backend files via SCP
-        uses: appleboy/scp-action@v0.1.7
+      - name: Deploy BE via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4
         with:
-          host: ${{ secrets.BE_SSH_HOST }}
-          username: ${{ secrets.BE_SSH_USER }}
-          key: ${{ secrets.BE_SSH_KEY }}
-          source: "backend/*"
-          target: "/home/user/backend/"
-
-      - name: Run deploy script on server
-        uses: appleboy/ssh-action@v1.1.1
-        with:
-          host: ${{ secrets.BE_SSH_HOST }}
-          username: ${{ secrets.BE_SSH_USER }}
-          key: ${{ secrets.BE_SSH_KEY }}
-          script: |
-            cd /home/user/backend/
-            chmod +x deploy.sh
-            ./deploy.sh
+          server: ${{ secrets.BE_FTP_HOST }}
+          username: ${{ secrets.BE_FTP_USER }}
+          password: ${{ secrets.BE_FTP_PASSWORD }}
+          server-dir: "/htdocs/backend/"
+          local-dir: "backend/"
