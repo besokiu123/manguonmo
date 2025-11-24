@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chi tiết sản phẩm</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header"><div class="container nav-row"><div class="logo">Pawsome</div><nav class="nav"><a href="index.html">Trang chủ</a><a href="cart.html">Giỏ hàng</a></nav></div></header>
+    <main class="container">
+      <div id="root">Đang tải...</div>
+    </main>
+
+    <script>
+      function qs(n){return new URL(window.location.href).searchParams.get(n)}
+      async function load(){
+        const id = qs('id'); if(!id){document.getElementById('root').innerText='Missing id'; return}
+        try{
+          const res = await fetch('/backend/api/product.php?id='+encodeURIComponent(id)); const d = await res.json(); if(!d.success){document.getElementById('root').innerText='Not found'; return}
+          const p = d.product; document.getElementById('root').innerHTML = `
+            <div style="display:grid;grid-template-columns:320px 1fr;gap:16px">
+              <img src="${p.image}" style="width:100%;border-radius:8px"/>
+              <div>
+                <h2>${p.name}</h2>
+                <p>${p.description}</p>
+                <p style="color:var(--accent);font-weight:700">₫${p.price.toLocaleString('vi-VN')}</p>
+                <div style="margin-top:12px"><button id="add" class="btn-primary">Thêm vào giỏ</button></div>
+              </div>
+            </div>
+          `;
+          document.getElementById('add').addEventListener('click', async ()=>{
+            const r = await fetch('/backend/api/cart.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:parseInt(id),qty:1})});
+            if(!r.ok){alert('Lỗi server');return} const j=await r.json(); if(j.success) alert('Đã thêm'); else alert('Lỗi: '+j.message);
+          });
+        }catch(e){document.getElementById('root').innerText='Lỗi kết nối'}
+      }
+      load();
+    </script>
+  </body>
+</html>
